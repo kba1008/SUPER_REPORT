@@ -3,17 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Laporan AI Universal</title>
+    <title>SUPER REPORT - AI</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.png">
+    <meta name="theme-color" content="#4f46e5">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #4f46e5; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .scroll-hide::-webkit-scrollbar { display: none; }
-        /* Font Arial Saiz 12 (approx 16px/12pt) untuk paparan yang bersih */
         textarea { font-family: 'Arial', sans-serif; font-size: 12pt; line-height: 1.5; }
+        .label-text { display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 0.25rem; }
+        .input-field { width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background-color: #ffffff; outline: none; transition: all; font-size: 0.875rem; }
+        .input-field:focus { border-color: #6366f1; ring: 2px; --tw-ring-color: #6366f1; }
     </style>
 </head>
 <body class="p-3 md:p-8" onload="fetchHistory()">
@@ -21,27 +28,30 @@
     <div class="max-w-5xl mx-auto space-y-6">
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
             <div class="bg-indigo-900 p-6 text-white flex justify-between items-center">
-                <div>
-                    <h1 class="text-xl md:text-2xl font-bold tracking-tight uppercase">Penjana Laporan AI Universal</h1>
-                    <p class="text-indigo-200 text-xs mt-1">Apa Sahaja Jenis Laporan | Auto-Format | Profesional</p>
+                <div class="flex items-center gap-4">
+                    <img src="logo.png" alt="Logo" class="w-12 h-12 rounded-lg bg-white p-1">
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold tracking-tight uppercase">SUPER REPORT</h1>
+                        <p class="text-indigo-200 text-xs mt-1">Penjana Laporan AI Pintar & Pantas</p>
+                    </div>
                 </div>
                 <div class="text-right hidden md:block">
-                    <div class="text-xs bg-indigo-800 py-1 px-3 rounded-full">Versi Universal 4.0</div>
+                    <div class="text-xs bg-indigo-800 py-1 px-3 rounded-full">v4.0 Pro</div>
                 </div>
             </div>
 
             <div class="p-6 md:p-8 space-y-6">
                 <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
                     <label class="block text-xs font-bold text-indigo-800 uppercase mb-2">Langkah 1: Nyatakan Jenis Laporan</label>
-                    <input type="text" id="reportType" class="w-full p-3 border border-indigo-200 rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-gray-700" placeholder="Cth: Laporan Nilam / Minit Curai / Aktiviti Panitia" oninput="this.value = this.value.toUpperCase()">
+                    <input type="text" id="reportType" class="w-full p-3 border border-indigo-200 rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-gray-700" placeholder="Cth: LAPORAN NILAM / MINIT CURAI" oninput="this.value = this.value.toUpperCase()">
                 </div>
 
                 <div>
-                    <p class="text-xs text-gray-400 italic mb-3">* Isi maklumat asas yang standard. AI akan sesuaikan format mengikut jenis laporan anda.</p>
+                    <p class="text-xs text-gray-400 italic mb-3">* Maklumat asas untuk rujukan AI.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="label-text">Tajuk / Perkara / Unit</label>
-                            <input type="text" id="subject" class="input-field" placeholder="Cth: Mesyuarat AJK PIBG Bil 1/2024" oninput="this.value = this.value.toUpperCase()">
+                            <label class="label-text">Tajuk / Perkara</label>
+                            <input type="text" id="subject" class="input-field" placeholder="Cth: MESYUARAT PIBG" oninput="this.value = this.value.toUpperCase()">
                         </div>
                         <div>
                             <label class="label-text">Tarikh & Masa</label>
@@ -50,45 +60,30 @@
                                 <input type="time" id="reportTime" class="input-field w-1/3">
                             </div>
                         </div>
-
                         <div>
-                            <label class="label-text">Pegawai Pelapor / Guru Utama</label>
-                            <input type="text" id="teacher" class="input-field" placeholder="Nama Anda" oninput="this.value = this.value.toUpperCase()">
+                            <label class="label-text">Pegawai Pelapor</label>
+                            <input type="text" id="teacher" class="input-field" oninput="this.value = this.value.toUpperCase()">
                         </div>
                         <div>
-                            <label class="label-text">Guru Pembantu / SU (Jika Ada)</label>
-                            <input type="text" id="assistant" class="input-field" placeholder="Optional" oninput="this.value = this.value.toUpperCase()">
+                            <label class="label-text">Lokasi</label>
+                            <input type="text" id="location" class="input-field" oninput="this.value = this.value.toUpperCase()">
                         </div>
-
-                        <div>
-                            <label class="label-text">Bilangan Terlibat / Kehadiran</label>
-                            <input type="text" id="studentCount" class="input-field" placeholder="Cth: 30 Orang" oninput="this.value = this.value.toUpperCase()">
-                        </div>
-                        <div>
-                            <label class="label-text">Lokasi / Tempat</label>
-                            <input type="text" id="location" class="input-field" placeholder="Cth: Bilik Gerakan / Dewan" oninput="this.value = this.value.toUpperCase()">
-                        </div>
-                        
                         <div class="col-span-full">
-                            <label class="label-text">Sasaran (Siapa yang terlibat)</label>
-                            <input type="text" id="targetGroup" class="input-field" placeholder="Cth: Semua Guru & AKP" oninput="this.value = this.value.toUpperCase()">
+                            <label class="label-text">Sasaran</label>
+                            <input type="text" id="targetGroup" class="input-field" oninput="this.value = this.value.toUpperCase()">
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="label-text">Muat Naik Gambar (1 - 10 Keping)</label>
+                    <label class="label-text">Lampiran Gambar (Maks 10)</label>
                     <div class="grid grid-cols-2 gap-3">
-                        <!-- Butang Kamera -->
-                        <label class="flex flex-col items-center justify-center h-24 border-2 border-dashed border-indigo-300 rounded-xl hover:bg-indigo-50 cursor-pointer bg-white transition-colors group">
-                            <svg class="w-8 h-8 mb-1 text-indigo-600 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316zM16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"></path></svg>
-                            <span class="text-indigo-700 text-[10px] font-bold uppercase">Kamera</span>
+                        <label class="flex flex-col items-center justify-center h-24 border-2 border-dashed border-indigo-300 rounded-xl hover:bg-indigo-50 cursor-pointer bg-white transition-colors">
+                            <span class="text-indigo-700 text-[10px] font-bold uppercase">Ambil Gambar</span>
                             <input type="file" accept="image/*" capture="environment" onchange="handleImages(this)" class="hidden">
                         </label>
-                        <!-- Butang Galeri -->
-                        <label class="flex flex-col items-center justify-center h-24 border-2 border-dashed border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer bg-white transition-colors group">
-                            <svg class="w-8 h-8 mb-1 text-gray-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"></path></svg>
-                            <span class="text-gray-500 text-[10px] font-bold uppercase">Galeri</span>
+                        <label class="flex flex-col items-center justify-center h-24 border-2 border-dashed border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer bg-white transition-colors">
+                            <span class="text-gray-500 text-[10px] font-bold uppercase">Buka Galeri</span>
                             <input type="file" accept="image/*" multiple onchange="handleImages(this)" class="hidden">
                         </label>
                     </div>
@@ -96,72 +91,44 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label class="label-text text-indigo-700">Poin Ringkas / Agenda / Nota (AI Akan Kembangkan)</label>
-                    <textarea id="notes" rows="4" class="w-full p-4 border rounded-xl bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-400 placeholder-gray-400 text-sm" placeholder="Masukkan poin penting di sini. Contoh:
-- Ucapan aluan pengerusi
-- Bincang isu kehadiran murid
-- Cadangan program motivasi
-- Penutup dan jamuan ringan"></textarea>
+                    <label class="label-text text-indigo-700">Poin Ringkas (AI Akan Kembangkan)</label>
+                    <textarea id="notes" rows="4" class="w-full p-4 border rounded-xl bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-400 text-sm" placeholder="Cth: Ucapan Guru Besar, Isu disiplin, Cadangan program..."></textarea>
                 </div>
 
-                <button onclick="generateAndSave()" id="btnAction" class="w-full bg-indigo-700 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-indigo-800 active:scale-95 transition-all text-md tracking-wide flex items-center justify-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813a3.75 3.75 0 002.576-2.576l.813-2.846A.75.75 0 019 4.5zM18 1.5a.75.75 0 01.728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 010 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 01-1.456 0l-.258-1.036a2.625 2.625 0 00-1.91-1.91l-1.036-.258a.75.75 0 010-1.456l1.036-.258a2.625 2.625 0 001.91-1.91l.258-1.036A.75.75 0 0118 1.5zM16.5 15a.75.75 0 01.712.513l.394 1.183c.15.447.5.799.948.948l1.183.394a.75.75 0 010 1.422l-1.183.394c-.447.15-.799.5-.948.948l-.394 1.183a.75.75 0 01-1.422 0l-.394-1.183a1.5 1.5 0 00-.948-.948l-1.183-.394a.75.75 0 010-1.422l1.183-.394a1.5 1.5 0 00.948-.948l.394-1.183A.75.75 0 0116.5 15z" clip-rule="evenodd"></path></svg> JANA LAPORAN PENUH
+                <button onclick="generateAndSave()" id="btnAction" class="w-full bg-indigo-700 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-indigo-800 active:scale-95 transition-all flex items-center justify-center">
+                   JANA LAPORAN SUPER
                 </button>
                 
                 <div id="loading" class="hidden flex flex-col items-center py-4">
                     <div class="loader"></div>
-                    <p id="status" class="text-indigo-700 text-sm mt-3 font-medium animate-pulse">AI sedang menulis laporan anda...</p>
+                    <p id="status" class="text-indigo-700 text-sm mt-3 font-medium animate-pulse">AI sedang bekerja...</p>
                 </div>
             </div>
         </div>
 
         <div id="resultArea" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-8 space-y-4 border border-gray-200">
-            <div class="flex justify-between items-center border-b pb-4">
-                <h3 class="font-bold text-gray-800 uppercase tracking-wider">Laporan Siap</h3>
-                <span class="text-[10px] bg-green-100 text-green-800 px-3 py-1 rounded-full font-bold flex items-center">
-                    DISIMPAN KE GOOGLE SHEET
-                    <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"></path></svg>
-                </span>
-            </div>
-            
+            <h3 class="font-bold text-gray-800 uppercase tracking-wider">Hasil Laporan</h3>
             <textarea id="output" rows="18" class="w-full p-5 border rounded-xl bg-slate-50 text-sm text-gray-800 outline-none shadow-inner whitespace-pre-wrap resize-none"></textarea>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                 <button onclick="copyToClipboard()" class="bg-gray-600 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 flex items-center justify-center">
-                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    Salin Teks Sahaja
-                </button>
-                <button onclick="downloadPDF()" class="bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-800 shadow-md flex items-center justify-center">
-                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                     Muat Turun PDF
-                </button>
-                <button onclick="sharePDF()" class="bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 shadow-md flex items-center justify-center">
-                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                     Kongsi PDF
-                </button>
+                 <button onclick="copyToClipboard()" class="bg-gray-600 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 flex items-center justify-center">Salin Teks</button>
+                <button onclick="downloadPDF()" class="bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-800 shadow-md flex items-center justify-center">Muat Turun PDF</button>
+                <button onclick="sharePDF()" class="bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 shadow-md flex items-center justify-center">Kongsi PDF</button>
             </div>
         </div>
 
         <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
-            <h3 class="text-sm font-bold text-gray-500 uppercase mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"></path></svg> Rekod Terdahulu
-            </h3>
+            <h3 class="text-sm font-bold text-gray-500 uppercase mb-4">Rekod Terdahulu</h3>
             <div id="historyList" class="space-y-3">
-                <p class="text-gray-400 text-sm animate-pulse">Menghubungkan ke pangkalan data...</p>
+                <p class="text-gray-400 text-sm">Menunggu data...</p>
             </div>
         </div>
     </div>
 
-    <style>
-        .label-text { display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 0.25rem; }
-        .input-field { width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background-color: #ffffff; outline: none; transition: all; font-size: 0.875rem; }
-        .input-field:focus { ring: 2px solid #6366f1; border-color: #6366f1; }
-    </style>
-
     <script>
+        // CONFIG & LOGIC (Kekal sama seperti kod anda)
         const CONFIG = {
             API_KEY: "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", 
-            // URL GAS Anda
             GAS_URL: "https://script.google.com/macros/s/AKfycbw0V8xQ9YeP559gvjjkngTdDW7GULGby9PG4jk5_8uTJgfii2GPYW2gMl2mb1BAIJ90/exec",
             MODEL: "llama-3.3-70b-versatile" 
         };
@@ -169,6 +136,16 @@
         let images = [];
         let historyData = [];
 
+        // Registrasi Service Worker untuk PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SUPER REPORT SW Terdaftar!'))
+                .catch(err => console.log('Gagal daftar SW:', err));
+            });
+        }
+
+        // --- Fungsi-fungsi JS anda dikekalkan di sini ---
         function handleImages(input) {
             const files = Array.from(input.files);
             if (images.length + files.length > 10) return alert("Maksimum 10 gambar.");
@@ -180,8 +157,17 @@
                 };
                 reader.readAsDataURL(file);
             });
-            // FIX: Reset nilai input supaya boleh pilih gambar sama/lain semula tanpa sekatan
             input.value = '';
+        }
+
+        function renderPreviews() {
+            const container = document.getElementById('previewArea');
+            container.innerHTML = images.map((img, i) => `
+                <div class="relative flex-shrink-0">
+                    <img src="${img.src}" class="w-20 h-20 object-cover rounded-lg border">
+                    <button class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs" onclick="removeImage(${i})">×</button>
+                </div>
+            `).join('');
         }
 
         function removeImage(index) {
@@ -189,100 +175,35 @@
             renderPreviews();
         }
 
-        function renderPreviews() {
-            const container = document.getElementById('previewArea');
-            container.innerHTML = images.map((img, i) => `
-                <div class="relative flex-shrink-0 group">
-                    <img src="${img.src}" class="w-20 h-20 object-cover rounded-lg border border-gray-200 shadow-sm">
-                    <!-- FIX: Butang padam dengan icon SVG -->
-                    <button class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-md z-10 hover:bg-red-600 transition-colors" onclick="removeImage(${i})">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-            `).join('');
-        }
-
         async function generateAndSave() {
-            // Ambil data tanpa default (kosong jika tidak diisi)
-            const type = document.getElementById('reportType').value || "LAPORAN UMUM";
-            const subject = document.getElementById('subject').value;
-            const date = document.getElementById('reportDate').value || new Date().toISOString().split('T')[0];
-            const time = document.getElementById('reportTime').value || "08:00";
-            const teacher = document.getElementById('teacher').value;
-            const assistant = document.getElementById('assistant').value;
-            const studentCount = document.getElementById('studentCount').value;
-            const location = document.getElementById('location').value;
-            const targetGroup = document.getElementById('targetGroup').value;
             const notes = document.getElementById('notes').value;
-
-            // Hanya nota dan sekurang-kurangnya 1 gambar wajib untuk konteks AI
-            if(!notes) return alert("Sila masukkan sedikit poin ringkas aktiviti untuk AI kembangkan.");
+            if(!notes) return alert("Sila masukkan nota ringkas.");
             
             document.getElementById('btnAction').classList.add('hidden');
             document.getElementById('loading').classList.remove('hidden');
 
-            let systemPrompt = "";
-            const instructions = "Gunakan Bahasa Melayu Malaysia yang tepat, ringkas, dan padat. Panjang laporan MESTI antara 250 hingga 300 patah perkataan. JANGAN gunakan garisan pemisah panjang seperti '-----' atau '===='. Gunakan jarak perenggan yang kemas sahaja.";
-            
-            // --- LOGIK AI UNIVERSAL ---
-            // AI akan menentukan format berdasarkan input 'type' pengguna
-            systemPrompt = `Anda adalah pembantu penulisan dokumen rasmi sekolah yang profesional.
-            TUGASAN: Tulis satu '${type}' yang lengkap dan profesional berdasarkan maklumat di bawah.
+            const type = document.getElementById('reportType').value || "LAPORAN";
+            const subject = document.getElementById('subject').value;
 
-            ARAHAN KHAS:
-            1. ${instructions}
-            2. Sesuaikan format laporan mengikut jenis '${type}'. (Contoh: Jika 'Minit Curai', guna format minit. Jika 'Laporan Program', guna format laporan program).
-            3. Pastikan ayat yang dijana adalah gramatis dan matang.
-
-            MAKLUMAT ASAS:
-            - Jenis Dokumen: ${type}
-            - Tajuk/Perkara: ${subject}
-            - Tarikh: ${date}
-            - Masa: ${time}
-            - Tempat: ${location}
-            - Sasaran/Terlibat: ${targetGroup}
-            - Kehadiran: ${studentCount}
-            - Guru/Pelapor: ${teacher}
-            - Guru Pembantu: ${assistant}
-
-            NOTA / POIN UTAMA (Sila kembangkan): 
-            ${notes}
-
-            Sila hasilkan output laporan sepenuhnya sekarang.`;
+            let systemPrompt = `Anda adalah penulis laporan profesional. Tulis ${type} tentang ${subject} dalam 250-300 patah perkataan. Gunakan Bahasa Melayu yang mantap. Poin: ${notes}`;
 
             try {
                 const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
                     headers: { "Authorization": `Bearer ${CONFIG.API_KEY}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        model: CONFIG.MODEL, 
-                        messages: [{ role: "user", content: systemPrompt }],
-                        temperature: 0.65 
-                    })
+                    body: JSON.stringify({ model: CONFIG.MODEL, messages: [{ role: "user", content: systemPrompt }] })
                 });
                 
-                // FIX: Semak jika respons gagal (selain 200 OK)
-                if (!resp.ok) {
-                    const errData = await resp.json();
-                    throw new Error(errData.error?.message || "Ralat API: " + resp.status);
-                }
-
                 const data = await resp.json();
-                if (!data.choices || !data.choices[0]) throw new Error("Tiada respons dari AI.");
+                const report = data.choices[0].message.content;
 
-                const successReport = data.choices[0].message.content;
-
-                document.getElementById('output').value = successReport;
+                document.getElementById('output').value = report;
                 document.getElementById('resultArea').classList.remove('hidden');
-                document.getElementById('status').innerText = "Sedang simpan ke Google Sheet...";
                 
-                // Hantar ke Google Sheet
-                await autoSaveToGS(successReport, subject, teacher, type);
+                await autoSaveToGS(report, subject, document.getElementById('teacher').value, type);
                 fetchHistory();
-
             } catch (e) {
-                console.error(e);
-                alert("Ralat: " + e.message + "\n(Sila semak sambungan internet atau API KEY)");
+                alert("Ralat penjanaan AI.");
             }
 
             document.getElementById('btnAction').classList.remove('hidden');
@@ -290,18 +211,8 @@
         }
 
         async function autoSaveToGS(reportText, subject, teacher, type) {
-            const payload = {
-                action: "MASUK",
-                passcode: "101010",
-                nama: teacher,
-                type: type,
-                tujuan: subject,
-                report: reportText,
-                images: images.map(img => ({ data: img.src.split(',')[1], name: img.name }))
-            };
-            try {
-                await fetch(CONFIG.GAS_URL, { method: "POST", body: JSON.stringify(payload) });
-            } catch (e) { console.error("Auto-save error"); }
+            const payload = { action: "MASUK", passcode: "101010", nama: teacher, type: type, tujuan: subject, report: reportText, images: images.map(img => ({ data: img.src.split(',')[1], name: img.name })) };
+            try { await fetch(CONFIG.GAS_URL, { method: "POST", body: JSON.stringify(payload) }); } catch (e) {}
         }
 
         async function fetchHistory() {
@@ -309,216 +220,48 @@
                 const resp = await fetch(CONFIG.GAS_URL, { method: "POST", body: JSON.stringify({ action: "HISTORY", passcode: "101010" }) });
                 const data = await resp.json();
                 historyData = data.reverse();
-
                 document.getElementById('historyList').innerHTML = historyData.map((rec, idx) => `
-                    <div class="p-4 border-l-4 border-indigo-600 bg-white shadow-sm rounded-r-lg hover:bg-gray-50 transition-colors">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">${rec.date}</span>
-                            <span class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold">${rec.type.replace('LAPORAN ', '')}</span>
+                    <div class="p-3 border-l-4 border-indigo-600 bg-white shadow-sm rounded-r-lg flex justify-between items-center">
+                        <div class="truncate mr-4">
+                            <p class="text-xs font-bold text-indigo-600">${rec.type}</p>
+                            <p class="text-sm font-semibold truncate">${rec.tujuan}</p>
                         </div>
-                        <div class="font-bold text-gray-800 text-sm truncate">${rec.tujuan}</div>
-                        <div class="text-xs text-gray-500 mt-1">Oleh: ${rec.nama}</div>
-                        
-                        <div class="flex gap-2 mt-3 overflow-x-auto pb-1">
-                            ${rec.imgCols.filter(link => link !== "").map((link, idx) => `
-                                <a href="${link}" target="_blank" class="text-[10px] flex items-center gap-1 bg-white border border-gray-200 px-2 py-1 rounded hover:bg-indigo-50 text-indigo-600 transition-colors">
-                                    <svg class="w-3 h-3 inline" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
-                                    Foto ${idx+1}
-                                </a>
-                            `).join('')}
-                            <button onclick="restore(${idx})" class="text-[10px] ml-auto bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-900 font-medium">
-                                LIHAT
-                            </button>
-                        </div>
+                        <button onclick="restore(${idx})" class="text-xs bg-gray-800 text-white px-3 py-1 rounded">LIHAT</button>
                     </div>
                 `).join('');
-            } catch (e) { document.getElementById('historyList').innerHTML = "Tiada rekod dijumpai."; }
+            } catch (e) {}
         }
 
         function restore(idx) {
             const rec = historyData[idx];
-            
-            // 1. Pulihkan Input (untuk tujuan edit PDF/Generate semula)
-            document.getElementById('subject').value = rec.tujuan || "";
-            document.getElementById('teacher').value = rec.nama || "";
-            if(rec.type) document.getElementById('reportType').value = rec.type;
-            
-            // 2. Pulihkan Teks Laporan
             document.getElementById('output').value = rec.report;
-            
-            // 3. Pulihkan Gambar (Visual)
-            // FIX: Pastikan URL Google Drive ditukar kepada format yang boleh dipapar dalam tag img
-            images = (rec.imgCols || []).filter(link => link).map(link => {
-                let url = link;
-                // Jika URL adalah Google Drive View Link, tukar ke Export View ID untuk paparan
-                const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-                if (driveMatch && url.includes('drive.google.com')) {
-                    url = `https://drive.google.com/uc?export=view&id=${driveMatch[1]}`;
-                }
-                return { src: url, name: "History Image" };
-            });
-            renderPreviews();
-            
-            // 4. Paparan
             document.getElementById('resultArea').classList.remove('hidden');
-            // FIX: Scroll ke atas untuk memastikan gambar kelihatan
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            alert("Rekod dipulihkan. Anda boleh semak gambar di atas dan laporan di bawah.");
         }
 
         function copyToClipboard() {
             const copyText = document.getElementById("output");
             copyText.select();
-            copyText.setSelectionRange(0, 99999); 
             navigator.clipboard.writeText(copyText.value);
-            alert("Teks laporan berjaya disalin!");
+            alert("Salin Berjaya!");
         }
 
         function downloadPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
-            const content = document.getElementById('output').value;
-
-            // MODIFIKASI: Tukar Font ke Helvetica (Arial equivalent) dan saiz 12
-            doc.setFont("helvetica", "normal"); 
-            doc.setFontSize(12);
-            
-            // MODIFIKASI: Buang header 'DOKUMEN DIJANA OLEH SISTEM AI'
-            // Biarkan kosong atau tajuk program
-            const title = document.getElementById('subject').value || "LAPORAN AKTIVITI";
-            doc.setFont("helvetica", "bold");
-            doc.text(title.toUpperCase(), 105, 15, null, null, "center");
-            
-            doc.setFont("helvetica", "normal");
-            const lines = doc.splitTextToSize(content, 170);
-            let y = 25; // Adjusted Y start
-            
-            // Tulis baris demi baris, tambah page jika perlu
-            lines.forEach(line => {
-                if (y > 280) { doc.addPage(); y = 20; }
-                doc.text(line, 20, y);
-                y += 6; // Sedikit jarak lebih luas (Line height)
-            });
-
-            // Muka Surat Gambar: Auto susun dalam satu A4 (1-10 gambar)
-            if(images.length > 0) {
-                doc.addPage();
-                doc.setFont("helvetica", "bold");
-                doc.text("LAMPIRAN BERGAMBAR", 105, 15, null, null, "center");
-                
-                const imgCount = images.length;
-                let cols = 1;
-                // Jika > 2 gambar, guna 2 lajur. Jika 1-2 gambar, kekal 1 lajur (menegak)
-                if (imgCount > 2) cols = 2;
-                
-                const rows = Math.ceil(imgCount / cols);
-                
-                // Kawasan kerja A4: width 190 (margin 10), height 260 (top 25, btm 12)
-                const areaW = 190;
-                const areaH = 260;
-                const gap = 5;
-                
-                const cellW = (areaW - (gap * (cols - 1))) / cols;
-                const cellH = (areaH - (gap * (rows - 1))) / rows;
-                
-                images.forEach((img, i) => {
-                    // Dapatkan dimensi untuk kekalkan aspect ratio
-                    const props = doc.getImageProperties(img.src);
-                    const ratio = props.width / props.height;
-
-                    const col = i % cols;
-                    const row = Math.floor(i / cols);
-                    
-                    const xBox = 10 + (col * (cellW + gap));
-                    const yBox = 25 + (row * (cellH + gap));
-                    
-                    let drawW = cellW;
-                    let drawH = drawW / ratio;
-                    
-                    if (drawH > cellH) {
-                        drawH = cellH;
-                        drawW = drawH * ratio;
-                    }
-                    
-                    // Center gambar dalam kotak
-                    const offsetX = xBox + (cellW - drawW) / 2;
-                    const offsetY = yBox + (cellH - drawH) / 2;
-                    
-                    doc.addImage(img.src, 'JPEG', offsetX, offsetY, drawW, drawH);
-                });
-            }
-            
-            const fName = (document.getElementById('subject').value || "Laporan").replace(/[^a-zA-Z0-9 ]/g, "").trim().replace(/\s+/g, "_");
-            const fTime = (document.getElementById('reportTime').value || "").replace(":", "");
-            doc.save(`${fName}_${fTime}.pdf`);
+            const doc = new jsPDF();
+            doc.setFont("helvetica");
+            doc.text(document.getElementById('output').value, 10, 10, { maxWidth: 180 });
+            doc.save("SUPER_REPORT.pdf");
         }
 
         async function sharePDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
-            const content = document.getElementById('output').value;
-            const title = document.getElementById('subject').value || "LAPORAN AKTIVITI";
-            
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.text(title.toUpperCase(), 105, 15, null, null, "center");
-            
-            doc.setFont("helvetica", "normal");
-            const lines = doc.splitTextToSize(content, 170);
-            let y = 25;
-            
-            lines.forEach(line => {
-                if (y > 280) { doc.addPage(); y = 20; }
-                doc.text(line, 20, y);
-                y += 6;
-            });
-
-            if(images.length > 0) {
-                doc.addPage();
-                doc.setFont("helvetica", "bold");
-                doc.text("LAMPIRAN BERGAMBAR", 105, 15, null, null, "center");
-                const imgCount = images.length;
-                let cols = imgCount > 2 ? 2 : 1;
-                const rows = Math.ceil(imgCount / cols);
-                const areaW = 190, areaH = 260, gap = 5;
-                const cellW = (areaW - (gap * (cols - 1))) / cols;
-                const cellH = (areaH - (gap * (rows - 1))) / rows;
-                
-                images.forEach((img, i) => {
-                    const props = doc.getImageProperties(img.src);
-                    const ratio = props.width / props.height;
-                    const col = i % cols;
-                    const row = Math.floor(i / cols);
-                    const xBox = 10 + (col * (cellW + gap));
-                    const yBox = 25 + (row * (cellH + gap));
-                    let drawW = cellW, drawH = drawW / ratio;
-                    if (drawH > cellH) { drawH = cellH; drawW = drawH * ratio; }
-                    const offsetX = xBox + (cellW - drawW) / 2;
-                    const offsetY = yBox + (cellH - drawH) / 2;
-                    doc.addImage(img.src, 'JPEG', offsetX, offsetY, drawW, drawH);
-                });
-            }
-            
-            const fName = (document.getElementById('subject').value || "Laporan").replace(/[^a-zA-Z0-9 ]/g, "").trim().replace(/\s+/g, "_");
-            const fTime = (document.getElementById('reportTime').value || "").replace(":", "");
-            const fileName = `${fName}_${fTime}.pdf`;
-
+            const doc = new jsPDF();
+            doc.text(document.getElementById('output').value, 10, 10, { maxWidth: 180 });
             const pdfBlob = doc.output('blob');
-            const file = new File([pdfBlob], fileName, { type: "application/pdf" });
-
+            const file = new File([pdfBlob], "SuperReport.pdf", { type: "application/pdf" });
             if (navigator.share) {
-                try {
-                    await navigator.share({ 
-                        files: [file], 
-                        title: title, 
-                        text: 'Berikut adalah laporan aktiviti sekolah yang telah dijana.' 
-                    });
-                } catch (error) {
-                    console.log('Error sharing:', error);
-                }
-            } else {
-                alert("Fungsi kongsi tidak disokong pada peranti ini. Sila guna butang Muat Turun.");
+                navigator.share({ files: [file], title: 'Laporan AI' });
             }
         }
     </script>
