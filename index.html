@@ -192,9 +192,8 @@
             const type = document.getElementById('reportType').value || "LAPORAN";
             const subject = document.getElementById('subject').value;
 
-            // Prompt dikemaskini mengikut permintaan: JANGAN BOLD.
-            // + Tambahan: Analisis Refleksi (SWOT)
-            let systemPrompt = `Bertindak sebagai pegawai pelapor rasmi di Malaysia. Tulis ${type} tentang ${subject}. Gunakan Bahasa Melayu Malaysia standard yang formal tetapi natural (tidak kaku/robotik). Elakkan huraian yang terlalu 'over' atau hiperbola. Pastikan isi kandungan realistik berdasarkan fakta ini: ${notes}. SETIAP LAPORAN MESTI MENGANDUNGI ANALISIS REFLEKSI (SWOT). JANGAN GUNAKAN SEBARANG FORMAT BOLD (HURUF TEBAL) ATAU TANDA **.`;
+            // Prompt dikemaskini mengikut permintaan: BM Malaysia, Natural, Tidak 'Over'.
+            let systemPrompt = `Bertindak sebagai pegawai pelapor rasmi di Malaysia. Tulis ${type} tentang ${subject}. Gunakan Bahasa Melayu Malaysia standard yang formal tetapi natural (tidak kaku/robotik). Elakkan huraian yang terlalu 'over' atau hiperbola. Pastikan isi kandungan realistik berdasarkan fakta ini: ${notes}. JANGAN gunakan sebarang format BOLD (huruf tebal) atau markdown asterisk (**).`;
 
             try {
                 const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -255,30 +254,17 @@
             alert("Salin Berjaya!");
         }
 
-        // FUNGSI PDF DIKEMASKINI UNTUK GAMBAR (Surgical Edit + Tajuk & Tarikh)
+        // FUNGSI PDF DIKEMASKINI UNTUK GAMBAR (Surgical Edit)
         async function getPDFDoc() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-
-            // -- Edit: Tajuk & Tarikh di Header --
-            const subject = document.getElementById('subject').value || "LAPORAN";
-            const date = document.getElementById('reportDate').value || "";
             
-            // PERUBAHAN: Set font normal (bukan bold) mengikut permintaan murid.
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(14);
-            doc.text(subject.toUpperCase(), 105, 20, { align: "center" });
-
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.text("Tarikh: " + date, 105, 27, { align: "center" });
-            
-            // Page 1: Teks Laporan (Adjusted Y position)
+            // Page 1: Teks
             doc.setFont("helvetica");
             doc.setFontSize(11);
             const text = document.getElementById('output').value;
             const splitText = doc.splitTextToSize(text, 180);
-            doc.text(splitText, 15, 40); // Y moved to 40 to accommodate header
+            doc.text(splitText, 15, 15);
 
             // Page 2: Gambar (Jika Ada)
             if (images.length > 0) {
