@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="text-right hidden md:block">
-                    <div class="text-xs bg-indigo-800 py-1 px-3 rounded-full">v15.0 Pro</div>
+                    <div class="text-xs bg-indigo-800 py-1 px-3 rounded-full">v4.0 Pro</div>
                 </div>
             </div>
 
@@ -199,8 +199,8 @@
             const location = document.getElementById('location').value;
             const target = document.getElementById('targetGroup').value;
 
-            // FORMAT TERKINI DIKEMASKINI DENGAN ARAHAN TEGAS PANJANG
-            let systemPrompt = `Bertindak sebagai pegawai pelapor profesional. AMARAN: LAPORAN MESTI PANJANG (MINIMUM 350 PATAH PERKATAAN). JANGAN HASILKAN LAPORAN PENDEK. SILA HURAIKAN SETIAP ISI DENGAN MENDALAM.
+            // FORMAT TERKINI DIKEMASKINI
+            let systemPrompt = `Bertindak sebagai pegawai pelapor profesional. Anda MESTI mengikut format laporan di bawah SEPENUHNYA.
 
 DATA INPUT:
 Jenis: ${type}
@@ -223,17 +223,17 @@ LOKASI : ${location}
 SASARAN : ${target}
 
 AKTIVITI
-1. [Huraikan aktiviti 1 dengan ayat lengkap dan panjang lebar]
-2. [Huraikan aktiviti 2 dengan perincian penuh]
-(Gunakan nombor untuk senarai. Kembangkan isi supaya panjang.)
+1. [Huraikan aktiviti 1 dengan ayat lengkap]
+2. [Huraikan aktiviti 2]
+(Gunakan nombor untuk senarai)
 
-CATATAN / REFLEKSI: [Ulasan lengkap, terperinci dan profesional]
+CATATAN / REFLEKSI: [Ulasan ringkas]
 
 Disediakan oleh, 
 (Tandatangan) 
 ${teacher.toUpperCase()}
 
-ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Panjang laporan WAJIB LEBIH DARIPADA 350 PATAH PERKATAAN. Sila kembangkan setiap poin ringkas menjadi perenggan yang kukuh dan informatif.`;
+ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangkan huraian isi dengan mendalam. Tetapkan panjang laporan MINIMA 300 dan MAXIMA 350 patah perkataan.`;
 
             try {
                 const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -321,7 +321,8 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Panjang lapora
                 // Smart Grid Logic
                 let cols = 1, rows = 1;
                 const count = images.length;
-                if (count === 2) { cols = 1; rows = 2; }োঁয়া, rows = 2; }
+                if (count === 2) { cols = 1; rows = 2; }
+                else if (count <= 4) { cols = 2; rows = 2; }
                 else if (count <= 6) { cols = 2; rows = 3; }
                 else if (count <= 8) { cols = 2; rows = 4; }
                 else { cols = 2; rows = 5; }
