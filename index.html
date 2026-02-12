@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="text-right hidden md:block">
-                    <div class="text-xs bg-indigo-800 py-1 px-3 rounded-full">v4.0 Pro</div>
+                    <div class="text-xs bg-indigo-800 py-1 px-3 rounded-full">v10.0 Pro</div>
                 </div>
             </div>
 
@@ -302,7 +302,7 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
             alert("Salin Berjaya!");
         }
 
-        // FUNGSI PDF DIKEMASKINI UNTUK GAMBAR (Surgical Edit)
+        // FUNGSI PDF DIKEMASKINI: SATU PAGE A4 UNTUK GAMBAR (AUTO RESIZE)
         async function getPDFDoc() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -316,7 +316,7 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
 
             // Page 2: Gambar (Jika Ada)
             if (images.length > 0) {
-                doc.addPage();
+                doc.addPage(); // Force new page for images
                 doc.setFontSize(14);
                 doc.text("LAMPIRAN GAMBAR", 105, 20, { align: "center" });
                 
@@ -326,7 +326,7 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
                 const availW = pageW - (margin * 2);
                 const availH = pageH - startY - margin;
 
-                // Smart Grid Logic
+                // Smart Grid Logic to fit A4
                 let cols = 1, rows = 1;
                 const count = images.length;
                 if (count === 2) { cols = 1; rows = 2; }
@@ -338,7 +338,7 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
                 const boxW = availW / cols;
                 const boxH = availH / rows;
                 
-                // Get natural dimensions from DOM previews
+                // Get natural dimensions from DOM previews for aspect ratio calculations
                 const imgEls = document.querySelectorAll('#previewArea img');
 
                 for (let i = 0; i < count; i++) {
@@ -349,7 +349,7 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
 
                     const ratio = (imgEl.naturalWidth || 1) / (imgEl.naturalHeight || 1);
                     
-                    // Fit in box
+                    // Fit in box with aspect ratio preserved
                     let w = boxW - 4; 
                     let h = w / ratio;
                     if (h > (boxH - 4)) { h = boxH - 4; w = h * ratio; }
@@ -386,15 +386,54 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
             }
         }
 
+        // FUNGSI WORD DIKEMASKINI: SATU PAGE A4 UNTUK GAMBAR (AUTO RESIZE)
         function downloadWord() {
             let content = document.getElementById('output').value.replace(/\n/g, "<br>");
             
-            // PEMBAIKAN: Masukkan gambar ke dalam Word Document
+            // Masukkan gambar dalam Table untuk susunan Grid yg sama dengan PDF
             if (images.length > 0) {
-                content += "<br><br><h3>LAMPIRAN GAMBAR</h3>";
-                images.forEach(img => {
-                    content += `<p><img src="${img.src}" width="500" /></p>`;
-                });
+                content += "<br style='page-break-before: always'><h3>LAMPIRAN GAMBAR</h3>";
+                content += "<table style='width:100%; border-collapse: collapse;'>";
+                
+                // Grid Logic sama dengan PDF
+                let cols = 1, rows = 1;
+                const count = images.length;
+                if (count === 2) { cols = 1; rows = 2; }
+                else if (count <= 4) { cols = 2; rows = 2; }
+                else if (count <= 6) { cols = 2; rows = 3; }
+                else if (count <= 8) { cols = 2; rows = 4; }
+                else { cols = 2; rows = 5; }
+
+                // Anggaran saiz A4 dlm piksel (Word Web View friendly)
+                const boxW = 600 / cols; 
+                const boxH = 900 / rows; 
+                
+                const imgEls = document.querySelectorAll('#previewArea img');
+
+                for (let r = 0; r < rows; r++) {
+                    content += "<tr>";
+                    for (let c = 0; c < cols; c++) {
+                        const i = r * cols + c;
+                        if (i < count) {
+                            const imgEl = imgEls[i];
+                            const ratio = (imgEl.naturalWidth || 1) / (imgEl.naturalHeight || 1);
+                            
+                            // Kira saiz ikut ratio
+                            let w = boxW - 20; // padding
+                            let h = w / ratio;
+                            
+                            if (h > (boxH - 20)) { h = boxH - 20; w = h * ratio; }
+                            
+                            content += `<td style='text-align:center; padding:5px; vertical-align:middle; width:${100/cols}%'>
+                                <img src="${images[i].src}" width="${Math.floor(w)}" height="${Math.floor(h)}" />
+                            </td>`;
+                        } else {
+                            content += "<td></td>";
+                        }
+                    }
+                    content += "</tr>";
+                }
+                content += "</table>";
             }
 
             const html = `
