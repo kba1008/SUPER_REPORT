@@ -246,18 +246,77 @@
             alert("Salin Berjaya!");
         }
 
-        function downloadPDF() {
+        // FUNGSI PDF DIKEMASKINI UNTUK GAMBAR (Surgical Edit)
+        async function getPDFDoc() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            
+            // Page 1: Teks
             doc.setFont("helvetica");
-            doc.text(document.getElementById('output').value, 10, 10, { maxWidth: 180 });
+            doc.setFontSize(11);
+            const text = document.getElementById('output').value;
+            const splitText = doc.splitTextToSize(text, 180);
+            doc.text(splitText, 15, 15);
+
+            // Page 2: Gambar (Jika Ada)
+            if (images.length > 0) {
+                doc.addPage();
+                doc.setFontSize(14);
+                doc.text("LAMPIRAN GAMBAR", 105, 20, { align: "center" });
+                
+                const margin = 15;
+                const startY = 30;
+                const pageW = 210, pageH = 297;
+                const availW = pageW - (margin * 2);
+                const availH = pageH - startY - margin;
+
+                // Smart Grid Logic
+                let cols = 1, rows = 1;
+                const count = images.length;
+                if (count === 2) { cols = 1; rows = 2; }
+                else if (count <= 4) { cols = 2; rows = 2; }
+                else if (count <= 6) { cols = 2; rows = 3; }
+                else if (count <= 8) { cols = 2; rows = 4; }
+                else { cols = 2; rows = 5; }
+
+                const boxW = availW / cols;
+                const boxH = availH / rows;
+                
+                // Get natural dimensions from DOM previews
+                const imgEls = document.querySelectorAll('#previewArea img');
+
+                for (let i = 0; i < count; i++) {
+                    if (i >= 10) break;
+                    const imgData = images[i].src;
+                    const imgEl = imgEls[i];
+                    const format = imgData.match(/image\/(\w+);/)?.[1].toUpperCase() || 'JPEG';
+
+                    const ratio = (imgEl.naturalWidth || 1) / (imgEl.naturalHeight || 1);
+                    
+                    // Fit in box
+                    let w = boxW - 4; 
+                    let h = w / ratio;
+                    if (h > (boxH - 4)) { h = boxH - 4; w = h * ratio; }
+
+                    // Center in grid cell
+                    const r = Math.floor(i / cols);
+                    const c = i % cols;
+                    const x = margin + (c * boxW) + (boxW - w) / 2;
+                    const y = startY + (r * boxH) + (boxH - h) / 2;
+
+                    try { doc.addImage(imgData, format, x, y, w, h); } catch(e) { console.log(e); }
+                }
+            }
+            return doc;
+        }
+
+        async function downloadPDF() {
+            const doc = await getPDFDoc();
             doc.save("SUPER_REPORT.pdf");
         }
 
         async function sharePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text(document.getElementById('output').value, 10, 10, { maxWidth: 180 });
+            const doc = await getPDFDoc();
             const pdfBlob = doc.output('blob');
             const file = new File([pdfBlob], "SuperReport.pdf", { type: "application/pdf" });
             if (navigator.share) {
