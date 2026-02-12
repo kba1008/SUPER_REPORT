@@ -192,9 +192,9 @@
             const type = document.getElementById('reportType').value || "LAPORAN";
             const subject = document.getElementById('subject').value;
 
-            // Prompt dikemaskini mengikut permintaan: BM Malaysia, Natural, Tidak 'Over'.
+            // Prompt dikemaskini mengikut permintaan: JANGAN BOLD.
             // + Tambahan: Analisis Refleksi (SWOT)
-            let systemPrompt = `Bertindak sebagai pegawai pelapor rasmi di Malaysia. Tulis ${type} tentang ${subject}. Gunakan Bahasa Melayu Malaysia standard yang formal tetapi natural (tidak kaku/robotik). Elakkan huraian yang terlalu 'over' atau hiperbola. Pastikan isi kandungan realistik berdasarkan fakta ini: ${notes}. SETIAP LAPORAN MESTI MENGANDUNGI ANALISIS REFLEKSI (SWOT).`;
+            let systemPrompt = `Bertindak sebagai pegawai pelapor rasmi di Malaysia. Tulis ${type} tentang ${subject}. Gunakan Bahasa Melayu Malaysia standard yang formal tetapi natural (tidak kaku/robotik). Elakkan huraian yang terlalu 'over' atau hiperbola. Pastikan isi kandungan realistik berdasarkan fakta ini: ${notes}. SETIAP LAPORAN MESTI MENGANDUNGI ANALISIS REFLEKSI (SWOT). JANGAN GUNAKAN SEBARANG FORMAT BOLD (HURUF TEBAL) ATAU TANDA **.`;
 
             try {
                 const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -264,7 +264,8 @@
             const subject = document.getElementById('subject').value || "LAPORAN";
             const date = document.getElementById('reportDate').value || "";
             
-            doc.setFont("helvetica", "bold");
+            // PERUBAHAN: Set font normal (bukan bold) mengikut permintaan murid.
+            doc.setFont("helvetica", "normal");
             doc.setFontSize(14);
             doc.text(subject.toUpperCase(), 105, 20, { align: "center" });
 
