@@ -117,10 +117,11 @@
             <h3 class="font-bold text-gray-800 uppercase tracking-wider">Hasil Laporan</h3>
             <textarea id="output" rows="18" class="w-full p-5 border rounded-xl bg-slate-50 text-sm text-gray-800 outline-none shadow-inner whitespace-pre-wrap resize-none"></textarea>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                  <button onclick="copyToClipboard()" class="bg-gray-600 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 flex items-center justify-center">Salin Teks</button>
                 <button onclick="downloadPDF()" class="bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-800 shadow-md flex items-center justify-center">Muat Turun PDF</button>
                 <button onclick="sharePDF()" class="bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 shadow-md flex items-center justify-center">Kongsi PDF</button>
+                <button onclick="downloadWord()" class="bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 shadow-md flex items-center justify-center">Muat Turun Word</button>
             </div>
         </div>
 
@@ -137,7 +138,8 @@
         const CONFIG = {
             API_KEY: "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", 
             GAS_URL: "https://script.google.com/macros/s/AKfycbw0V8xQ9YeP559gvjjkngTdDW7GULGby9PG4jk5_8uTJgfii2GPYW2gMl2mb1BAIJ90/exec",
-            MODEL: "llama-3.3-70b-versatile" 
+            MODEL: "llama-3.3-70b-versatile",
+            MIN_WORDS: 500 // Tetapan panjang laporan minima
         };
 
         let images = [];
@@ -233,7 +235,7 @@ Disediakan oleh,
 (Tandatangan) 
 ${teacher.toUpperCase()}
 
-ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangkan huraian isi dengan mendalam. Tetapkan panjang laporan MINIMA 300 dan MAXIMA 350 patah perkataan.`;
+ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangkan huraian isi dengan mendalam. Tetapkan panjang laporan MINIMA ${CONFIG.MIN_WORDS} patah perkataan.`;
 
             try {
                 const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -376,6 +378,28 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
             if (navigator.share) {
                 navigator.share({ files: [file], title: 'Laporan AI' });
             }
+        }
+
+        function downloadWord() {
+            const content = document.getElementById('output').value.replace(/\n/g, "<br>");
+            const html = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head><meta charset='utf-8'><title>Laporan</title></head>
+                <body>${content}</body>
+                </html>`;
+            
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            
+            const subject = document.getElementById('subject').value.trim().replace(/[^a-zA-Z0-9 ]/g, '') || "Laporan";
+            const date = document.getElementById('reportDate').value || "Tarikh";
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${subject}_${date}.doc`; 
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
