@@ -191,10 +191,11 @@
 
             const type = document.getElementById('reportType').value || "LAPORAN";
             const subject = document.getElementById('subject').value;
+            const teacher = document.getElementById('teacher').value;
 
-            // Prompt dikemaskini mengikut permintaan: BM Malaysia, Natural, Tidak 'Over'.
+            // Prompt dikemaskini mengikut permintaan: Minima 300, Maksima 350 perkataan, Signature nama pegawai.
             // + Tambahan: Analisis Refleksi (SWOT)
-            let systemPrompt = `Bertindak sebagai pegawai pelapor rasmi di Malaysia. Tulis ${type} tentang ${subject}. Gunakan Bahasa Melayu Malaysia standard yang formal tetapi natural (tidak kaku/robotik). Elakkan huraian yang terlalu 'over' atau hiperbola. Pastikan isi kandungan realistik berdasarkan fakta ini: ${notes}. SETIAP LAPORAN MESTI MENGANDUNGI ANALISIS REFLEKSI (SWOT).`;
+            let systemPrompt = `Bertindak sebagai pegawai pelapor rasmi di Malaysia. Tulis ${type} tentang ${subject}. Gunakan Bahasa Melayu Malaysia standard yang formal tetapi natural (tidak kaku/robotik). Elakkan huraian yang terlalu 'over' atau hiperbola. Pastikan isi kandungan realistik berdasarkan fakta ini: ${notes}. SETIAP LAPORAN MESTI MENGANDUNGI ANALISIS REFLEKSI (SWOT). Laporan mestilah antara 300 hingga 350 patah perkataan. Pada bahagian paling bawah, sertakan ruang tandatangan dengan nama pegawai pelapor: ${teacher}.`;
 
             try {
                 const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -333,7 +334,11 @@
 
         async function downloadPDF() {
             const doc = await getPDFDoc();
-            doc.save("SUPER_REPORT.pdf");
+            const subject = document.getElementById('subject').value || "Laporan";
+            const date = document.getElementById('reportDate').value || "";
+            const cleanSubject = subject.replace(/[^a-zA-Z0-9]/g, '_');
+            const fileName = `${cleanSubject}_${date}.pdf`;
+            doc.save(fileName);
         }
 
         async function sharePDF() {
