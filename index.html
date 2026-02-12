@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="text-right hidden md:block">
-                    <div class="text-xs bg-indigo-800 py-1 px-3 rounded-full">v4.0 Projek</div>
+                    <div class="text-xs bg-indigo-800 py-1 px-3 rounded-full">v4.0 Pro</div>
                 </div>
             </div>
 
@@ -201,7 +201,7 @@
             const location = document.getElementById('location').value;
             const target = document.getElementById('targetGroup').value;
 
-            // FORMAT TERKINI DIKEMASKINI
+            // FORMAT TERKINI DIKEMASKINI DENGAN KEKUATAN & KELEMAHAN
             let systemPrompt = `Bertindak sebagai pegawai pelapor profesional. Anda MESTI mengikut format laporan di bawah SEPENUHNYA.
 
 DATA INPUT:
@@ -228,6 +228,12 @@ AKTIVITI
 1. [Huraikan aktiviti 1 dengan ayat lengkap]
 2. [Huraikan aktiviti 2]
 (Gunakan nombor untuk senarai)
+
+KEKUATAN:
+[Senaraikan kekuatan program/aktiviti]
+
+KELEMAHAN:
+[Senaraikan kelemahan program/aktiviti]
 
 CATATAN / REFLEKSI: [Ulasan ringkas]
 
@@ -381,7 +387,16 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
         }
 
         function downloadWord() {
-            const content = document.getElementById('output').value.replace(/\n/g, "<br>");
+            let content = document.getElementById('output').value.replace(/\n/g, "<br>");
+            
+            // PEMBAIKAN: Masukkan gambar ke dalam Word Document
+            if (images.length > 0) {
+                content += "<br><br><h3>LAMPIRAN GAMBAR</h3>";
+                images.forEach(img => {
+                    content += `<p><img src="${img.src}" width="500" /></p>`;
+                });
+            }
+
             const html = `
                 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
                 <head><meta charset='utf-8'><title>Laporan</title></head>
@@ -404,4 +419,3 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
     </script>
 </body>
 </html>
-
