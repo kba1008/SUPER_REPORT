@@ -370,9 +370,8 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
         async function downloadPDF() {
             const subject = document.getElementById('subject').value.trim().replace(/[^a-zA-Z0-9 ]/g, '') || "Laporan";
             const date = document.getElementById('reportDate').value || "Tarikh";
-            const time = document.getElementById('reportTime').value.replace(/:/g, '') || "Masa";
             
-            const fileName = `${subject}_${date}_${time}.pdf`.replace(/\s+/g, '_').toUpperCase();
+            const fileName = `${subject}_${date}.pdf`.replace(/\s+/g, '_').toUpperCase();
 
             const doc = await getPDFDoc();
             doc.save(fileName);
@@ -397,7 +396,7 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
 
             // 1. Ambil Data Laporan
             const text = document.getElementById('output').value;
-            const subject = document.getElementById('subject').value || "Laporan";
+            const subject = document.getElementById('subject').value.trim().replace(/[^a-zA-Z0-9 ]/g, '') || "Laporan";
             const date = document.getElementById('reportDate').value || "Tarikh";
             
             // Convert text lines to Paragraphs
@@ -474,7 +473,7 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
             });
 
             const blob = await Packer.toBlob(doc);
-            const fileName = `${subject}_${date}.docx`;
+            const fileName = `${subject}_${date}.docx`.replace(/\s+/g, '_').toUpperCase();
             
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
