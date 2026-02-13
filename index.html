@@ -386,40 +386,38 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
             }
         }
 
-        // FUNGSI WORD DIKEMASKINI: STRICT 1 PAGE A4 GRID LAYOUT
+        // FUNGSI WORD DIKEMASKINI: MENGIKUT PERMINTAAN TEPAT (GRID + MM)
         function downloadWord() {
             let content = document.getElementById('output').value.replace(/\n/g, "<br>");
             
             if (images.length > 0) {
-                // Force page break dan tajuk
                 content += "<br clear=all style='page-break-before:always'>";
                 content += "<h3 style='text-align:center; font-family:Arial,sans-serif;'>LAMPIRAN GAMBAR</h3>";
                 
-                // Grid Logic sama dengan PDF
-                let cols = 1, rows = 1;
                 const count = images.length;
-                if (count === 2) { cols = 1; rows = 2; }
-                else if (count <= 4) { cols = 2; rows = 2; }
-                else if (count <= 6) { cols = 2; rows = 3; }
-                else if (count <= 8) { cols = 2; rows = 4; }
-                else { cols = 2; rows = 5; }
+                let cols, imgW, imgH;
 
-                // Anggaran saiz A4 safe area (approx 900px height total untuk gambar)
-                const MAX_HEIGHT = 850;
-                const cellHeight = MAX_HEIGHT / rows;
+                // Logic susunan tepat ikut permintaan (Grid Logic based on provided snippet)
+                if (count === 1) { cols = 1; imgW = '160mm'; imgH = '220mm'; }
+                else if (count <= 2) { cols = 2; imgW = '85mm'; imgH = '220mm'; }
+                else if (count <= 4) { cols = 2; imgW = '85mm'; imgH = '115mm'; }
+                else if (count <= 6) { cols = 2; imgW = '85mm'; imgH = '75mm'; }
+                else if (count <= 8) { cols = 2; imgW = '85mm'; imgH = '55mm'; }
+                else { cols = 2; imgW = '85mm'; imgH = '42mm'; } // Max 10
 
-                // Table dengan layout tetap
-                content += "<table style='width:100%; border-collapse: collapse; table-layout: fixed;'>";
+                content += `<table style='width:100%; border-collapse: collapse; table-layout: fixed;'>`;
                 
                 let imgIdx = 0;
+                const rows = Math.ceil(count / cols);
+                
                 for (let r = 0; r < rows; r++) {
                     content += "<tr>";
                     for (let c = 0; c < cols; c++) {
                         if (imgIdx < count) {
                             const img = images[imgIdx];
-                            // Cell style untuk limit saiz
-                            content += `<td style='height:${cellHeight}px; text-align:center; vertical-align:middle; padding:5px; border:1px solid #ddd;'>
-                                <img src="${img.src}" style="max-width:100%; max-height:${cellHeight - 10}px; width:auto; height:auto; display:block; margin:auto;" />
+                            content += `<td style='text-align:center; vertical-align:middle; padding:5px; border:1px solid #ddd;'>
+                                <img src="${img.src}" style="width:${imgW}; max-height:${imgH}; object-fit:contain; display:block; margin:auto;" />
+                                <div style="font-size:9pt; margin-top:2px; font-family:Arial,sans-serif;">Gambar ${imgIdx + 1}</div>
                             </td>`;
                             imgIdx++;
                         } else {
@@ -430,7 +428,7 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
                 }
                 content += "</table>";
             }
-
+            
             const html = `
                 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
                 <head><meta charset='utf-8'><title>Laporan</title>
