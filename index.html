@@ -386,14 +386,14 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
             }
         }
 
-        // FUNGSI WORD DIKEMASKINI: SATU PAGE A4 UNTUK GAMBAR (AUTO RESIZE)
+        // FUNGSI WORD DIKEMASKINI: STRICT 1 PAGE A4 GRID LAYOUT
         function downloadWord() {
             let content = document.getElementById('output').value.replace(/\n/g, "<br>");
             
-            // Masukkan gambar dalam Table untuk susunan Grid yg sama dengan PDF
             if (images.length > 0) {
-                content += "<br style='page-break-before: always'><h3>LAMPIRAN GAMBAR</h3>";
-                content += "<table style='width:100%; border-collapse: collapse;'>";
+                // Force page break dan tajuk
+                content += "<br clear=all style='page-break-before:always'>";
+                content += "<h3 style='text-align:center; font-family:Arial,sans-serif;'>LAMPIRAN GAMBAR</h3>";
                 
                 // Grid Logic sama dengan PDF
                 let cols = 1, rows = 1;
@@ -404,29 +404,24 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
                 else if (count <= 8) { cols = 2; rows = 4; }
                 else { cols = 2; rows = 5; }
 
-                // Anggaran saiz A4 dlm piksel (Word Web View friendly)
-                const boxW = 600 / cols; 
-                const boxH = 900 / rows; 
-                
-                const imgEls = document.querySelectorAll('#previewArea img');
+                // Anggaran saiz A4 safe area (approx 900px height total untuk gambar)
+                const MAX_HEIGHT = 850;
+                const cellHeight = MAX_HEIGHT / rows;
 
+                // Table dengan layout tetap
+                content += "<table style='width:100%; border-collapse: collapse; table-layout: fixed;'>";
+                
+                let imgIdx = 0;
                 for (let r = 0; r < rows; r++) {
                     content += "<tr>";
                     for (let c = 0; c < cols; c++) {
-                        const i = r * cols + c;
-                        if (i < count) {
-                            const imgEl = imgEls[i];
-                            const ratio = (imgEl.naturalWidth || 1) / (imgEl.naturalHeight || 1);
-                            
-                            // Kira saiz ikut ratio
-                            let w = boxW - 20; // padding
-                            let h = w / ratio;
-                            
-                            if (h > (boxH - 20)) { h = boxH - 20; w = h * ratio; }
-                            
-                            content += `<td style='text-align:center; padding:5px; vertical-align:middle; width:${100/cols}%'>
-                                <img src="${images[i].src}" width="${Math.floor(w)}" height="${Math.floor(h)}" />
+                        if (imgIdx < count) {
+                            const img = images[imgIdx];
+                            // Cell style untuk limit saiz
+                            content += `<td style='height:${cellHeight}px; text-align:center; vertical-align:middle; padding:5px; border:1px solid #ddd;'>
+                                <img src="${img.src}" style="max-width:100%; max-height:${cellHeight - 10}px; width:auto; height:auto; display:block; margin:auto;" />
                             </td>`;
+                            imgIdx++;
                         } else {
                             content += "<td></td>";
                         }
@@ -438,7 +433,9 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
 
             const html = `
                 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                <head><meta charset='utf-8'><title>Laporan</title></head>
+                <head><meta charset='utf-8'><title>Laporan</title>
+                <style>body{font-family:Arial, sans-serif;}</style>
+                </head>
                 <body>${content}</body>
                 </html>`;
             
