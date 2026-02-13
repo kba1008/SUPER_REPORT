@@ -10,6 +10,7 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -36,7 +37,7 @@
                     </div>
                 </div>
                 <div class="text-right hidden md:block">
-                    <div class="text-xs bg-indigo-800 py-1 px-3 rounded-full">v33.0 Pro</div>
+                    <div class="text-xs bg-indigo-800 py-1 px-3 rounded-full">v4.0 Pro</div>
                 </div>
             </div>
 
@@ -386,71 +387,103 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
             }
         }
 
-        // FUNGSI WORD DIKEMASKINI: MENGIKUT PERMINTAAN TEPAT (GRID + MM)
-        function downloadWord() {
-            let content = document.getElementById('output').value.replace(/\n/g, "<br>");
-            
-            if (images.length > 0) {
-                content += "<br clear=all style='page-break-before:always'>";
-                content += "<h3 style='text-align:center; font-family:Arial,sans-serif;'>LAMPIRAN GAMBAR</h3>";
-                
-                const count = images.length;
-                let cols, imgW, imgH;
-
-                // Logic susunan tepat ikut permintaan (Grid Logic based on provided snippet)
-                if (count === 1) { cols = 1; imgW = '160mm'; imgH = '220mm'; }
-                else if (count <= 2) { cols = 2; imgW = '85mm'; imgH = '220mm'; }
-                else if (count <= 4) { cols = 2; imgW = '85mm'; imgH = '115mm'; }
-                else if (count <= 6) { cols = 2; imgW = '85mm'; imgH = '75mm'; }
-                else if (count <= 8) { cols = 2; imgW = '85mm'; imgH = '55mm'; }
-                else { cols = 2; imgW = '85mm'; imgH = '42mm'; } // Max 10
-
-                content += `<table style='width:100%; border-collapse: collapse; table-layout: fixed;'>`;
-                
-                let imgIdx = 0;
-                const rows = Math.ceil(count / cols);
-                
-                for (let r = 0; r < rows; r++) {
-                    content += "<tr>";
-                    for (let c = 0; c < cols; c++) {
-                        if (imgIdx < count) {
-                            const img = images[imgIdx];
-                            content += `<td style='text-align:center; vertical-align:middle; padding:5px; border:1px solid #ddd;'>
-                                <img src="${img.src}" style="width:${imgW}; max-height:${imgH}; object-fit:contain; display:block; margin:auto;" />
-                                <div style="font-size:9pt; margin-top:2px; font-family:Arial,sans-serif;">Gambar ${imgIdx + 1}</div>
-                            </td>`;
-                            imgIdx++;
-                        } else {
-                            content += "<td></td>";
-                        }
-                    }
-                    content += "</tr>";
-                }
-                content += "</table>";
+        // FUNGSI WORD DIKEMASKINI: MENGGUNAKAN LIBRARY DOCX + LOGIK SUSUNAN MURID
+        async function downloadWord() {
+            if (typeof docx === 'undefined') {
+                return alert("Sila tunggu library DOCX dimuatkan...");
             }
             
-            const html = `
-                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                <head><meta charset='utf-8'><title>Laporan</title>
-                <style>body{font-family:Arial, sans-serif;}</style>
-                </head>
-                <body>${content}</body>
-                </html>`;
-            
-            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-            const url = URL.createObjectURL(blob);
-            
-            const subject = document.getElementById('subject').value.trim().replace(/[^a-zA-Z0-9 ]/g, '') || "Laporan";
+            const { Document, Packer, Paragraph, Table, TableRow, TableCell, ImageRun, WidthType, HeightRule, TextRun, AlignmentType } = docx;
+
+            // 1. Ambil Data Laporan
+            const text = document.getElementById('output').value;
+            const subject = document.getElementById('subject').value || "Laporan";
             const date = document.getElementById('reportDate').value || "Tarikh";
             
+            // Convert text lines to Paragraphs
+            const textParagraphs = text.split('\n').map(line => new Paragraph({
+                children: [new TextRun({ text: line, font: "Arial", size: 24 })], // 24 = 12pt
+                spacing: { after: 120 }
+            }));
+
+            // 2. Logic Susun Gambar (Dari Request Murid)
+            let imageTable = null;
+            let imageHeader = null;
+
+            if (images.length > 0) {
+                // Header Lampiran
+                imageHeader = new Paragraph({
+                    children: [new TextRun({ text: "\nLAMPIRAN GAMBAR", bold: true, size: 28 })],
+                    alignment: AlignmentType.CENTER,
+                    pageBreakBefore: true
+                });
+
+                // --- MULA KOD MURID ---
+                const numImages = images.length;
+                const PAGE_WIDTH = 9000; 
+                const PAGE_HEIGHT = 13000;
+                
+                const cols = Math.ceil(Math.sqrt(numImages * (PAGE_WIDTH / PAGE_HEIGHT)));
+                const rows = Math.ceil(numImages / cols);
+                const targetWidth = Math.floor(PAGE_WIDTH / cols) - 100;
+                const targetHeight = Math.floor(PAGE_HEIGHT / rows) - 100;
+
+                function convertTwipToPixel(twip) { return twip / 15; }
+
+                const tableRows = [];
+                for (let r = 0; r < rows; r++) {
+                    const cells = [];
+                    for (let c = 0; c < cols; c++) {
+                        const index = r * cols + c;
+                        if (index < numImages) {
+                            cells.push(new TableCell({
+                                children: [new Paragraph({
+                                    children: [new ImageRun({
+                                        data: images[index].src,
+                                        transformation: {
+                                            width: convertTwipToPixel(targetWidth),
+                                            height: convertTwipToPixel(targetHeight),
+                                        },
+                                    })],
+                                    alignment: AlignmentType.CENTER
+                                })],
+                                verticalAlign: "center"
+                            }));
+                        } else {
+                            cells.push(new TableCell({ children: [] }));
+                        }
+                    }
+                    tableRows.push(new TableRow({ 
+                        children: cells,
+                        height: { value: targetHeight, rule: HeightRule.EXACTLY }
+                    }));
+                }
+
+                imageTable = new Table({
+                    rows: tableRows,
+                    width: { size: 100, type: WidthType.PERCENTAGE },
+                });
+                // --- TAMAT KOD MURID ---
+            }
+
+            // 3. Generate Doc
+            const children = [...textParagraphs];
+            if(imageHeader) children.push(imageHeader);
+            if(imageTable) children.push(imageTable);
+
+            const doc = new Document({
+                sections: [{ children: children }]
+            });
+
+            const blob = await Packer.toBlob(doc);
+            const fileName = `${subject}_${date}.docx`;
+            
             const link = document.createElement('a');
-            link.href = url;
-            link.download = `${subject}_${date}.doc`; 
-            document.body.appendChild(link);
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
             link.click();
             document.body.removeChild(link);
         }
     </script>
 </body>
 </html>
-
