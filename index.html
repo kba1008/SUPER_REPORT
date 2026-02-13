@@ -418,17 +418,16 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
                     pageBreakBefore: true
                 });
 
-                // --- MULA KOD MURID ---
+                // --- MULA KOD MURID (EDITED) ---
                 const numImages = images.length;
-                const PAGE_WIDTH = 9000; 
-                const PAGE_HEIGHT = 13000;
                 
-                const cols = Math.ceil(Math.sqrt(numImages * (PAGE_WIDTH / PAGE_HEIGHT)));
+                // Susunan Melintang: 2 Kolum Tetap untuk memuatkan 10 gambar
+                const cols = 2; 
                 const rows = Math.ceil(numImages / cols);
-                const targetWidth = Math.floor(PAGE_WIDTH / cols) - 100;
-                const targetHeight = Math.floor(PAGE_HEIGHT / rows) - 100;
-
-                function convertTwipToPixel(twip) { return twip / 15; }
+                
+                // Saiz gambar ditetapkan untuk kekemasan (300px lebar x 200px tinggi)
+                const imgPixelWidth = 300;
+                const imgPixelHeight = 200;
 
                 const tableRows = [];
                 for (let r = 0; r < rows; r++) {
@@ -441,21 +440,20 @@ ARAHAN: Jangan guna Markdown BOLD (**). Pastikan bahasa gramatis. Sila kembangka
                                     children: [new ImageRun({
                                         data: images[index].src,
                                         transformation: {
-                                            width: convertTwipToPixel(targetWidth),
-                                            height: convertTwipToPixel(targetHeight),
+                                            width: imgPixelWidth,
+                                            height: imgPixelHeight,
                                         },
                                     })],
                                     alignment: AlignmentType.CENTER
                                 })],
-                                verticalAlign: "center"
+                                verticalAlign: "center",
                             }));
                         } else {
                             cells.push(new TableCell({ children: [] }));
                         }
                     }
                     tableRows.push(new TableRow({ 
-                        children: cells,
-                        height: { value: targetHeight, rule: HeightRule.EXACTLY }
+                        children: cells
                     }));
                 }
 
