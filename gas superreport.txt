@@ -1,0 +1,78 @@
+function doPost(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0]; 
+  var data = JSON.parse(e.postData.contents);
+  
+  // Security Check
+  if (data.passcode !== "101010") {
+    return ContentService.createTextOutput(JSON.stringify({result: "error", message: "Invalid Passcode"})).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // MOD BARU: DAPATKAN API KEY (Request UI)
+  if (data.action === "GET_KEY") {
+    var keySheet = ss.getSheetByName("api_key");
+    var apiKey = "";
+    // Ambil dari Sheet 'api_key', Kolum A (1), Baris 1
+    if (keySheet) {
+      apiKey = keySheet.getRange(1, 1).getValue(); 
+    }
+    return ContentService.createTextOutput(JSON.stringify({apiKey: apiKey})).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // MOD 1: MENYIMPAN DATA (ACTION: MASUK)
+  if (data.action === "MASUK") {
+    var timestamp = Utilities.formatDate(new Date(), "GMT+8", "dd/MM/yyyy HH:mm");
+    
+    // Setup Folder Gambar di Google Drive
+    var folderName = "Laporan_Sekolah_Images";
+    var folder, folders = DriveApp.getFoldersByName(folderName);
+    if (folders.hasNext()) {
+      folder = folders.next();
+    } else {
+      folder = DriveApp.createFolder(folderName);
+    }
+    
+    // Proses Gambar (Sehingga 10 keping)
+    var imgUrls = ["", "", "", "", "", "", "", "", "", ""]; // Sediakan 10 slot kosong
+    if (data.images && data.images.length > 0) {
+      data.images.forEach(function(img, index) {
+        if(index < 10) { // Hadkan 10 gambar sahaja
+          var blob = Utilities.newBlob(Utilities.base64Decode(img.data), "image/jpeg", img.name);
+          var file = folder.createFile(blob);
+          file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+          imgUrls[index] = file.getUrl();
+        }
+      });
+    }
+
+    // Susunan Data ke Row (A, B, C, D, E, F...)
+    var rowData = [timestamp, data.nama, data.type, data.tujuan, data.report];
+    var finalRow = rowData.concat(imgUrls); // Gabungkan data teks dengan URL gambar
+    
+    sheet.appendRow(finalRow);
+    return ContentService.createTextOutput(JSON.stringify({result: "success"})).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // MOD 2: AMBIL SEJARAH (ACTION: HISTORY)
+  if (data.action === "HISTORY") {
+    var rows = sheet.getDataRange().getValues();
+    var results = [];
+    
+    // Ambil semua row kecuali header (mula dari row 1, bukan 0)
+    // Hadkan kepada 20 rekod terakhir supaya loading tak berat
+    var startRow = Math.max(1, rows.length - 20); 
+    
+    for (var i = startRow; i < rows.length; i++) {
+      results.push({
+        date: rows[i][0], 
+        nama: rows[i][1], 
+        type: rows[i][2], 
+        tujuan: rows[i][3], 
+        report: rows[i][4],
+        // Ambil kolum F(5) hingga O(14)
+        imgCols: [rows[i][5], rows[i][6], rows[i][7], rows[i][8], rows[i][9], rows[i][10], rows[i][11], rows[i][12], rows[i][13], rows[i][14]]
+      });
+    }
+    return ContentService.createTextOutput(JSON.stringify(results)).setMimeType(ContentService.MimeType.JSON);
+  }
+}
